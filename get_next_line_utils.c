@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/17 22:30:18 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/18 14:36:54 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,23 +45,25 @@ char	read_buf(int fd, char *buf) //ファイルを読み込む
 //正の数だった場合はそのままstatic内のものも足してmallocして文字列を作成する。
 //負の数だった場合はsizeにバッファサイズを足して、staticにも読み込んだ文字を入れる
 
-//文字列の移行
-char	ft_strcpy(char *res, char *dst, size_t i)
+//文字列の移行かつ文字数のカウント(文字すカウントはいらない気がする)
+size_t	ft_strcpy(char *res, char *dst)
 {
-	while (i--)
+	size_t	size;
+
+	size = 0;
+	while (dst[size] != '\0')
 	{
-		*res = *dst;
-		++res;
-		++dst;
+		res[size] = dst[size];
 	}
+	res[size] = '\0';
 	free(dst);
-	return (res);
+	return (size);
 }
 
 //\nを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる
 size_t	newline_number(char *buf)
 {
-	size_t buf_i;
+	size_t	buf_i;
 
 	buf_i = 0;
 	while (buf[buf_i])
@@ -73,26 +75,24 @@ size_t	newline_number(char *buf)
 	return (-1);
 }
 
-//returnする文字列の作成
+// returnする文字列の作成
 char	result_str(char *buf, size_t buf_i, char *dst, size_t size)
 {
 	char	*res;
-	size_t	i;
-	size_t	j;
+	size_t	res_len;
 
-	i = 0;
-	j = 0;
-	res = (char *)malloc(sizeof(char *) * (size + (buf_i + 1)));
-	// indexのズレで＋1する
-	while (i < size)
-	{
-		res[i] = dst[i];
-		++i;
-	}
+	res = (char *)malloc(sizeof(char *) * (size + buf_i));
+		// staticの中身の長さとbufの改行文字までのながさをmallocする
+	res_len = ft_strcpy(res, dst);
 	while (j == buf_i)
 	{
 		res[i + j] = buf[j];
 		++j;
 	}
-	return(res);
+	if (ft_slen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
+	{
+		dst = (char *)malloc(sizeof(char *) * (size + buf_i));
+		ft_strcpy()
+	}
+	return (res);
 }
