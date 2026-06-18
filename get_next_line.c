@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/17 22:41:13 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/18 20:05:22 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,46 @@ char	*get_next_line(int fd)
 	return (NULL);
 }
 
+char	*get_next_line(int fd)
+{
+	char		*buf;
+	char		*res;
+	static char	*dst;
+	ssize_t		tmp;
+	ssize_t		buf_i;
+	static size_t	size;
+
+	dst = NULL;
+	while (tmp < 0)
+	{
+		tmp = 0;
+		tmp = read_buf(fd, buf);
+		if (tmp == 0)
+		{
+			// resにdst分mallocする。strlcpy関数に入れ込んでもいい
+			strlcpy(res, dst);
+			return (res);
+		}
+		buf_i = newline_number(buf);
+		if (buf_i > -1)
+		{
+			return (size += (buf_i + 1), result_str(buf, buf_i, dst, size));
+		}
+		size += ft_strcpy(dst, buf);
+		// dstのサイズをはかって,bufの長さをたしたサイズ分mallocし直してstatic変数を更新する。もとからdst内にある文字列は別のところに移してswapみたいにする。
+	}
+	return (NULL);
+}
+/*
+readで読み込み、読み込みに失敗していないかtmpでかくにんする。
+失敗していたらstatic変数の中身を返す。（再度mallocして新しい変数にいれてかえす。freeとNULL文字いれるのを忘れずに）
+bufのなかみに改行があったらstaticの中身もたして新しい変数にいれ出力。
+なかったらstaticに保存され改行文字またはEOFがでるまでreadを繰り返す。
+
+
+readでエラーが出た場合はNULLを返す
+*/
+
 int	main(void)
 {
 	int	fd;
@@ -130,11 +170,3 @@ int	main(void)
 	printf("%s", get_next_line(fd));
 	close(fd);
 }
-
-
-
-if (*little == '\0')
-	return((char *)big)
-
-if (!*little)
-	return((char *)big)
