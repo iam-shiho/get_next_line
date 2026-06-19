@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/19 12:08:27 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/19 12:43:21 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,12 +137,8 @@ char	*get_next_line(int fd)
 	{
 		tmp = 0;
 		tmp = read_buf(fd, buf);
-		if (tmp == 0)
-		{
-			// resにdst分mallocする。strlcpy関数に入れ込んでもいい
-			strlcpy(res, dst);
-			return (res);
-		}
+		if (tmp == 0) // resにdst分mallocする。strlcpy関数に入れ込んでもいい;
+			return (strcpy(res, dst));
 		buf_i = newline_number(buf);
 		if (buf_i > -1)
 		{
