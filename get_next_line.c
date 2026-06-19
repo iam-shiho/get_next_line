@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/18 20:05:22 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/19 12:08:27 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,14 +124,15 @@ char	*get_next_line(int fd)
 
 char	*get_next_line(int fd)
 {
-	char		*buf;
-	char		*res;
-	static char	*dst;
-	ssize_t		tmp;
-	ssize_t		buf_i;
-	static size_t	size;
+	char			*buf;
+	char			*res;
+	static char		*dst;
+	ssize_t			tmp;
+	ssize_t			buf_i;
+	static size_t	dst_size;
 
 	dst = NULL;
+	dst_size = 0;
 	while (tmp < 0)
 	{
 		tmp = 0;
@@ -145,9 +146,10 @@ char	*get_next_line(int fd)
 		buf_i = newline_number(buf);
 		if (buf_i > -1)
 		{
-			return (size += (buf_i + 1), result_str(buf, buf_i, dst, size));
+			return (dst_size += (buf_i + 1), result_str(buf, buf_i, dst,
+					dst_size));
 		}
-		size += ft_strcpy(dst, buf);
+		dst_size += remake_str(dst, buf, buf_i);
 		// dstのサイズをはかって,bufの長さをたしたサイズ分mallocし直してstatic変数を更新する。もとからdst内にある文字列は別のところに移してswapみたいにする。
 	}
 	return (NULL);

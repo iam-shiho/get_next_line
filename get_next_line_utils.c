@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/18 19:57:00 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/19 12:10:32 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,24 +59,57 @@ ssize_t	newline_number(char *buf)
 }
 
 //文字列の移行かつ文字数のカウント(文字すカウントはいらない気がする)　もしresがNULLだった場合mallocするってしたら良さげな気がする。 最初になん文字resい入ってるかの処理もあったらいい気がする
-size_t	ft_strcpy(char *res, char *dst)
+// buf内の改行文字までwhileが回るようにsize指定をした。
+char	ft_strcpy(char *res, char *dst, size_t size)
+{
+	size_t	i;
+
+	i = 0;
+	while (dst[i] != '\0' && i < size)
+	{
+		res[i] = dst[i];
+		++i;
+	}
+	res[i] = '\0';
+	free(dst);
+	dst = NULL;
+	return (res);
+}
+
+size_t	ft_strlen(char *s)
 {
 	size_t	size;
 
 	size = 0;
-	while (dst[size] != '\0')
-	{
-		res[size] = dst[size];
+	while (s[size] != '\0' || s[size] != '\n') //改行があるのか気にする
 		++size;
-	}
-	res[size] = '\0';
-	free(dst);
-	dst = NULL;
 	return (size);
 }
 
+size_t	remake_str(char *dst, char *buf, ssize_t buf_i) // static内を更新する
+{
+	size_t dst_size;
+	size_t buf_size;
+	size_t i;
+	char *tmp;
+
+	dst_size = ft_strlen(dst);
+	buf_size = ft_strlen(buf[buf_i]);
+	tmp = (char *)malloc(sizeof(char *) * dst_size + 1); // tmpにdst内のなかみを預ける
+	if (!tmp)
+		return (NULL);
+	ft_strcpy(tmp, dst, dst_size);
+	dst = (char *)malloc(sizeof(char *) * dst_size + buf_size + 1);
+	if (!dst)
+		return (NULL);
+	ft_strcpy(dst, tmp, dst_size);
+	ft_strcpy(dst[dst_size], buf, buf_size);
+	return (ft_strlen(dst));
+}
+
 // returnする文字列の作成
-char	*result_str(char *buf, size_t buf_i, char *dst, size_t size) //dstのサイズをかぞえたい
+// dstのサイズをかぞえたい
+char	*result_str(char *buf, size_t buf_i, char *dst, size_t size)
 {
 	char	*res;
 	size_t	res_len;
@@ -84,6 +117,8 @@ char	*result_str(char *buf, size_t buf_i, char *dst, size_t size) //dstのサイ
 
 	i = 0;
 	res = (char *)malloc(sizeof(char *) * (size + buf_i + 1));
+	if (!res)
+		return (NULL);
 	// staticの中身の長さとbufの改行文字までのながさをmallocする
 	res_len = ft_strcpy(res, dst);
 	while (i == buf_i)
@@ -94,7 +129,8 @@ char	*result_str(char *buf, size_t buf_i, char *dst, size_t size) //dstのサイ
 	size = 0;
 	if (ft_slen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
 	{
-		dst = (char *)malloc(sizeof(char *) * ((buf_i + 1) + 1));//インデックスのズレと'\0'をいれるため
+		dst = (char *)malloc(sizeof(char *) * ((buf_i + 1) + 1));
+		//インデックスのズレと'\0'をいれるため
 		size = ft_strcpy(dst, buf[buf_i]);
 	}
 	return (res);
