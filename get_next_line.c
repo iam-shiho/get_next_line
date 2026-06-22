@@ -6,12 +6,100 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/22 16:00:11 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/22 22:20:48 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
+{
+	size_t	stuck_len;
+	size_t	buf_size;
+
+	// tmpにstuck内のなかみを預ける
+	stuck_len = ft_strlen(stuck);
+	buf_size = buf_i + 1;
+	stuck = (char *)malloc(sizeof(char) * (stuck_len + buf_size + 1));
+	if (!stuck)
+		return (-1);
+	ft_strcpy(stuck, ft_strdup(stuck), stuck_len);
+	ft_strcpy(&stuck[stuck_len], buf, buf_size);
+	return (ft_strlen(stuck));
+}
+
+// returnする文字列の作成
+// stuckのサイズをかぞえたい
+char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size)
+{
+	char	*res;
+	size_t	i;
+
+	i = 0;
+	res = (char *)malloc(sizeof(char) * (size + buf_i + 1 + 1));
+	if (!res)
+		return (NULL);
+	// staticの中身の長さとbufの改行文字までのながさをmallocする
+	ft_strcpy(res, stuck, size);
+	ft_strcpy(&res[size], buf, buf_i + 1);
+	if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
+	{
+		stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
+		//インデックスのズレと'\0'をいれるため
+		ft_strcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
+	}
+	return (res);
+}
+
+char	*get_next_line(int fd)
+{
+	char			*buf;
+	static char		*stuck;
+	ssize_t			tmp;
+	ssize_t			buf_i;
+	static ssize_t	stuck_len;
+
+	buf = NULL;
+	buf_i = -1;
+	while (buf_i < 0)
+	{
+		tmp = read_buf(fd, buf);
+		if (tmp == 0 || tmp == -1)     // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
+			return (ft_strdup(stuck)); // strdup nisite
+		buf_i = newline_number(buf);
+		if (buf_i > -1)
+		{
+			return (result_str(buf, buf_i, stuck, stuck_len));
+		}
+		stuck_len += remake_str(stuck, buf, buf_i);
+	}
+	return (NULL);
+}
+// stuckのサイズをはかって,bufの長さをたしたサイズ分mallocし直してstatic変数を更新する。もとからstuck内にある文字列は別のところに移してswapみたいにする。
+/*
+readで読み込み、読み込みに失敗していないかtmpでかくにんする。
+失敗していたらstatic変数の中身を返す。（再度mallocして新しい変数にいれてかえす。freeとNULL文字いれるのを忘れずに）
+bufのなかみに改行があったらstaticの中身もたして新しい変数にいれ出力。
+なかったらstaticに保存され改行文字またはEOFがでるまでreadを繰り返す。
+
+
+readでエラーが出た場合はNULLを返す
+*/
+
+// stuck_len += (buf_i + 1),
+
+int	main(void)
+{
+	int		fd;
+	char	*buf;
+
+	buf = NULL;
+	printf("%p\n", buf);
+	fd = open("./a.txt", O_RDONLY);
+	printf("%s", read_buf(fd, &buf));
+	printf("%p\n", buf);
+	close(fd);
+}
 // char	*get_next_line(int fd)
 // {
 // 	char		*buf;
@@ -121,98 +209,4 @@
 // 	}
 // 	return (NULL);
 // }
-
-size_t	remake_str(char *stuck, char *buf, ssize_t buf_i) // static内を更新する
-{
-	size_t stuck_size;
-	size_t buf_size;
-	char *tmp;
-
-	stuck_size = ft_strlen(stuck);
-	buf_size = buf_i + 1;
-	tmp = (char *)malloc(sizeof(char) * (stuck_size + 1)); // tmpにstuck内のなかみを預ける
-	if (!tmp)
-		return (-1);
-	ft_strcpy(tmp, stuck, stuck_size);
-	stuck = (char *)malloc(sizeof(char) * (stuck_size + buf_size + 1));
-	if (!stuck)
-		return (-1);
-	ft_strcpy(stuck, tmp, stuck_size);
-	ft_strcpy(&stuck[stuck_size], buf, buf_size);
-	return (ft_strlen(stuck));
-}
-
-// returnする文字列の作成
-// stuckのサイズをかぞえたい
-char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size)
-{
-	char	*res;
-	size_t	i;
-
-	i = 0;
-	res = (char *)malloc(sizeof(char) * (size + 1));
-	if (!res)
-		return (NULL);
-	// staticの中身の長さとbufの改行文字までのながさをmallocする
-	ft_strcpy(res, stuck, size);
-	ft_strcpy(&res[size], buf, buf_i + 1);
-	if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
-	{
-		stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
-		//インデックスのズレと'\0'をいれるため
-		ft_strcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
-	}
-	return (res);
-}
-
-char	*get_next_line(int fd)
-{
-	char			*buf;
-	char			*res;
-	static char		*stuck;
-	ssize_t			tmp;
-	ssize_t			buf_i;
-	static ssize_t	stuck_size;
-
-	res = NULL;
-	buf = NULL;
-	tmp = -1;
-	while (tmp < 0)
-	{
-		tmp = 0;
-		tmp = read_buf(fd, buf);
-		if (tmp == 0)                   
-			// resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
-			return (strcpy(res, stuck)); // strdup nisite
-		buf_i = newline_number(buf);
-		if (buf_i > -1)
-		{
-			return (stuck_size += (buf_i + 1), result_str(buf, buf_i, stuck,
-					stuck_size));
-		}
-		tmp = remake_str(stuck, buf, buf_i);
-		if (tmp == -1)
-			return (NULL);
-		stuck_size += tmp;
-	}
-	return (NULL);
-}
-// stuckのサイズをはかって,bufの長さをたしたサイズ分mallocし直してstatic変数を更新する。もとからstuck内にある文字列は別のところに移してswapみたいにする。
-/*
-readで読み込み、読み込みに失敗していないかtmpでかくにんする。
-失敗していたらstatic変数の中身を返す。（再度mallocして新しい変数にいれてかえす。freeとNULL文字いれるのを忘れずに）
-bufのなかみに改行があったらstaticの中身もたして新しい変数にいれ出力。
-なかったらstaticに保存され改行文字またはEOFがでるまでreadを繰り返す。
-
-
-readでエラーが出た場合はNULLを返す
-*/
-
-int	main(void)
-{
-	int	fd;
-
-	fd = open("./a.txt", O_RDONLY);
-	printf("%s", get_next_line(fd));
-	close(fd);
-}
+// static内を更新する
