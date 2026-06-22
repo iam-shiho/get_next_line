@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/22 14:33:31 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/22 16:00:11 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ ssize_t	read_buf(int fd, char *buf) //ファイルを読み込む
 
 	buf = malloc(BUFFER_SIZE + 1); //'\0'入れるための＋１
 	tmp = read(fd, buf, BUFFER_SIZE);
-	if(tmp )
-	buf[BUFFER_SIZE] = '\0';
+	if (tmp)
+		buf[BUFFER_SIZE] = '\0';
 	return (tmp);
 }
 
@@ -61,19 +61,19 @@ ssize_t	newline_number(char *buf)
 
 //文字列の移行かつ文字数のカウント(文字すカウントはいらない気がする)　もしresがNULLだった場合mallocするってしたら良さげな気がする。 最初になん文字resい入ってるかの処理もあったらいい気がする
 // buf内の改行文字までwhileが回るようにsize指定をした。
-char	ft_strcpy(char *res, char *dst, size_t size)
+char	ft_strcpy(char *res, char *stuck, size_t size)
 {
 	size_t	i;
 
 	i = 0;
-	while (dst[i] != '\0' && i < size)
+	while (stuck[i] != '\0' && i < size)
 	{
-		res[i] = dst[i];
+		res[i] = stuck[i];
 		++i;
 	}
 	res[i] = '\0';
-	free(dst);
-	dst = NULL;
+	free(stuck);
+	stuck = NULL;
 	return (*res);
 }
 
