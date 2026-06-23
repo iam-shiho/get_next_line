@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/22 22:20:48 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 13:30:11 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
 	stuck = (char *)malloc(sizeof(char) * (stuck_len + buf_size + 1));
 	if (!stuck)
 		return (-1);
-	ft_strcpy(stuck, ft_strdup(stuck), stuck_len);
-	ft_strcpy(&stuck[stuck_len], buf, buf_size);
+	ft_strlcpy(stuck, ft_strdup(stuck), stuck_len);
+	ft_strlcpy(&stuck[stuck_len], buf, buf_size);
 	return (ft_strlen(stuck));
 }
 
@@ -40,13 +40,13 @@ char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size)
 	if (!res)
 		return (NULL);
 	// staticの中身の長さとbufの改行文字までのながさをmallocする
-	ft_strcpy(res, stuck, size);
-	ft_strcpy(&res[size], buf, buf_i + 1);
+	ft_strlcpy(res, stuck, size);
+	ft_strlcpy(&res[size], buf, buf_i + 1);
 	if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
 	{
 		stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
 		//インデックスのズレと'\0'をいれるため
-		ft_strcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
+		ft_strlcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
 	}
 	return (res);
 }
@@ -55,7 +55,6 @@ char	*get_next_line(int fd)
 {
 	char			*buf;
 	static char		*stuck;
-	ssize_t			tmp;
 	ssize_t			buf_i;
 	static ssize_t	stuck_len;
 
@@ -63,8 +62,8 @@ char	*get_next_line(int fd)
 	buf_i = -1;
 	while (buf_i < 0)
 	{
-		tmp = read_buf(fd, buf);
-		if (tmp == 0 || tmp == -1)     // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
+		buf = read_buf(fd, buf);
+		if (buf == NULL)               // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
 			return (ft_strdup(stuck)); // strdup nisite
 		buf_i = newline_number(buf);
 		if (buf_i > -1)
@@ -88,18 +87,37 @@ readでエラーが出た場合はNULLを返す
 
 // stuck_len += (buf_i + 1),
 
+// int	main(void)
+// {
+// 	int		fd;
+// 	char	*buf;
+
+// 	buf = NULL;
+// 	fd = open("./a.txt", O_RDONLY);
+// 	// get_next_line(fd);
+// 	buf = read_buf(fd, buf);
+// 	printf("$%s$", read_buf(fd, buf));
+// 	printf("#%s#", buf);
+// 	printf("^%zd^", newline_number(buf));
+// 	close(fd);
+// }
+
 int	main(void)
 {
-	int		fd;
-	char	*buf;
+	char	*str_for_test;
+	char	*res;
 
-	buf = NULL;
-	printf("%p\n", buf);
-	fd = open("./a.txt", O_RDONLY);
-	printf("%s", read_buf(fd, &buf));
-	printf("%p\n", buf);
-	close(fd);
+	str_for_test = strdup("Hello");
+	res = ft_strdup(str_for_test);
+	free(res);
+	return (0);
 }
+
+// int	main(void)
+// {
+// 	printf("%s", ft_strdup("Hello"));
+// }
+
 // char	*get_next_line(int fd)
 // {
 // 	char		*buf;

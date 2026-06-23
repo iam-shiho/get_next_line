@@ -6,27 +6,25 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/22 22:18:07 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 13:27:50 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 //ファイルを読み込む
-char	read_buf(int fd, char *buf)
+char	*read_buf(int fd, char *buf)
 {
 	ssize_t	tmp;
 
 	buf = malloc(BUFFER_SIZE + 1); //'\0'入れるための＋１
 	if (!buf)
-		return (-1);
+		return (NULL);
 	tmp = read(fd, buf, BUFFER_SIZE);
-	printf("%zd\n", tmp);
 	if (tmp > 0)
-	{
-		buf[1] = 'a';
 		buf[tmp] = '\0';
-	}
+	else if (tmp <= 0)
+		return (buf = NULL);
 	return (buf);
 }
 
@@ -49,7 +47,7 @@ ssize_t	newline_number(char *buf)
 
 //文字列の移行かつ文字数のカウント(文字すカウントはいらない気がする)　もしresがNULLだった場合mallocするってしたら良さげな気がする。 最初になん文字resい入ってるかの処理もあったらいい気がする
 // buf内の改行文字までwhileが回るようにsize指定をした。
-void	ft_strcpy(char *res, char *stuck, size_t size)
+void	ft_strlcpy(char *res, char *stuck, size_t size)
 {
 	size_t	i;
 
