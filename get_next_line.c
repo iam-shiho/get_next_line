@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 15:49:29 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 21:38:59 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
 {
 	size_t	stuck_len;
 	size_t	buf_size;
-	char *tmp;
+	char	*tmp;
 
 	// tmpにstuck内のなかみを預ける
 	stuck_len = ft_strlen(stuck);
@@ -25,8 +25,9 @@ size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
 	stuck = (char *)malloc(sizeof(char) * (stuck_len + buf_size + 1));
 	if (!stuck)
 		return (-1);
-	ft_strlcpy(stuck, tmp, stuck_len);
-	ft_strlcpy(&stuck[stuck_len], buf, buf_size);
+	stuck = ft_strjoin(tmp, buf);
+	// ft_strlcpy(stuck, tmp, stuck_len);
+	// ft_strlcpy(&stuck[stuck_len], buf, buf_size);
 	return (ft_strlen(stuck));
 }
 
@@ -35,21 +36,27 @@ size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
 char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size)
 {
 	char	*res;
+	char	*tmp;
 	size_t	i;
 
 	i = 0;
 	res = (char *)malloc(sizeof(char) * (size + buf_i + 1 + 1));
 	if (!res)
 		return (NULL);
+	tmp = malloc(sizeof(char) * (buf_i + 1));
+	if (!res)
+		return (NULL);
+	ft_strlcpy(tmp, buf, buf_i + 1);
+	res = ft_strjoin(stuck, tmp);
 	// staticの中身の長さとbufの改行文字までのながさをmallocする
-	ft_strlcpy(res, stuck, size);
-	ft_strlcpy(&res[size], buf, buf_i + 1);
-	if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
-	{
-		stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
-		//インデックスのズレと'\0'をいれるため
-		ft_strlcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
-	}
+	// ft_strlcpy(res, stuck, size);
+	// ft_strlcpy(&res[size], buf, buf_i + 1);
+	// if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
+	// {
+	// 	stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
+	// 	//インデックスのズレと'\0'をいれるため
+	// 	ft_strlcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
+	// }
 	return (res);
 }
 
@@ -61,7 +68,7 @@ char	*get_next_line(int fd)
 	static ssize_t	stuck_len;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-        return (NULL);
+		return (NULL);
 	buf = NULL;
 	buf_i = -1;
 	while (buf_i < 0)
@@ -69,14 +76,26 @@ char	*get_next_line(int fd)
 		buf = read_buf(fd, buf);
 		if (buf == NULL)               // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
 			return (ft_strdup(stuck)); // strdup nisite
-		printf("#%s#", buf);
+		printf("#%s#\n", buf);
 		buf_i = newline_number(buf);
+		printf("index#%zd#\n", buf_i);
 		if (buf_i > -1)
-		{
 			return (result_str(buf, buf_i, stuck, stuck_len));
+		if (stuck == NULL)
+		{
+			stuck = malloc(ft_strlen(buf) + 1);
+			ft_strlcpy(stuck, buf, ft_strlen(buf) + 1);
+			printf("stuck1#%s#\n", stuck);
 		}
-		stuck = ft_strjoin(stuck, buf);
+		else
+		{
+			stuck = ft_strjoin(stuck, buf);
+			printf("stuck2#%s#\n", stuck);
+		}
+		printf("stuck#%s#\n", stuck);
 		stuck_len = ft_strlen(stuck);
+		printf("len#%zd#\n", stuck_len);
+		printf("stuck2##\n");
 		buf = NULL;
 	}
 	return (NULL);
@@ -102,7 +121,8 @@ int	main(void)
 	buf = NULL;
 	fd = open("./a.txt", O_RDONLY);
 	get_next_line(fd);
-	buf = read_buf(fd, buf);
+	printf("%s", get_next_line(fd));
+	// buf = read_buf(fd, buf);
 	// printf("$%s$", read_buf(fd, buf));
 	// printf("#%s#", buf);
 	// printf("^%zd^", newline_number(buf));
@@ -154,15 +174,18 @@ int	main(void)
 // 				return ("-1");
 // 		}
 // 		i = 0;
-// 		while (buf[i] != '\n' || buf[i] != EOF || i < (BUFFER_SIZE)) //\nチェック
+// 		while (buf[i] != END || buf[i] != EOF || i < (BUFFER_SIZE))
+// //ENDチェック
 // 		{
 // 			++i;
-// 			if (buf[i] == '\n' || buf[i] == EOF) // 改行を見つけた際、returnする文字列の作成 3
+// 			if (buf[i] == END || buf[i] == EOF) //
+// 改行を見つけた際、returnする文字列の作成 3
 // 			{
 // 				k = 0;
 // 				l = 0;
-// 				res = (char *)malloc(sizeof(char *) * (i + size));
-// 				//\nまでのメモリを確保する
+// 				res = (char *)malloc(sizeof(char *) * (i +
+// size));
+// 				//ENDまでのメモリを確保する
 // 				if (!res)
 // 					return (NULL);
 // 				while (k < size) // stuckの中身を代入
@@ -180,7 +203,8 @@ int	main(void)
 // 				l = 0;
 // 				if (0 < (BUFFER_SIZE - 1) - i)
 // 				{
-// 					stuck = (char *)malloc(sizeof(char *) * ((BUFFER_SIZE - 1)
+// 					stuck = (char *)malloc(sizeof(char *) *
+// ((BUFFER_SIZE - 1)
 // 								- i));
 // 					while ((BUFFER_SIZE - 1) - i)
 // 					{
@@ -193,10 +217,11 @@ int	main(void)
 // 				return (res);
 // 			}
 // 		}
-// 		//もし0文字目で\nがあった場合の対応をする
+// 		//もし0文字目でENDがあった場合の対応をする
 // 		//行の文字列の長さを出力する
 // 		hako = malloc(size);
-// 		while (k < size) // stuckの中身を代入　buf分ついかしたいから再度mallocをする。
+// 		while (k < size) //
+// stuckの中身を代入　buf分ついかしたいから再度mallocをする。
 // 		{
 // 			hako[k] = stuck[k];
 // 			++k;
@@ -207,8 +232,8 @@ int	main(void)
 // 		stuckにbufを入れていく。
 // 		stuckに入っているやつを一回別の場所に移して、free.
 // 		そのあとstuck足すiのmallocをしてreturnする文字列を作成する。
-// 		\nがまだない場合は\nがでてくるまでreadを繰り返す
-// 		\nが出てきた場合はreturnする。
+// 		ENDがまだない場合はENDがでてくるまでreadを繰り返す
+// 		ENDが出てきた場合はreturnする。
 // 		mallocとfreeを繰り返して返すものをつくっていく。
 // 		*/
 // 		size += i;

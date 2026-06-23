@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 15:55:38 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 18:47:54 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*read_buf(int fd, char *buf)
 	return (buf);
 }
 
-//\nを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる
+// ENDを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる
 ssize_t	newline_number(char *buf)
 {
 	ssize_t	buf_i;
@@ -38,7 +38,7 @@ ssize_t	newline_number(char *buf)
 		return (-1);
 	while (buf[buf_i])
 	{
-		if (buf[buf_i] == '\n')
+		if (buf[buf_i] == END)
 			return (buf_i);
 		++buf_i;
 	}
@@ -50,8 +50,9 @@ ssize_t	newline_number(char *buf)
 void	ft_strlcpy(char *res, char *stuck, size_t size)
 {
 	size_t	i;
-	if(size == 0)
-		return;
+
+	if (size == 0)
+		return ;
 	i = 0;
 	while (stuck[i] != '\0' && i < size - 1)
 	{
@@ -85,8 +86,7 @@ char	*ft_strdup(char *stuck)
 	res = (char *)malloc(sizeof(char) * (len + 1));
 	if (!res)
 		return (NULL);
-	ft_strlcpy(res,stuck,len+1);
-	free(stuck);
+	ft_strlcpy(res, stuck, len + 1);
 	return (res);
 }
 
@@ -107,27 +107,31 @@ char	*ft_strjoin(char *stuck, char *buf)
 	res = malloc(sizeof(char) * (stuck_len + buf_len + 1));
 	if (!res)
 		return (NULL);
+	stuck =  ft_strdup(stuck);
+	buf =  ft_strdup(buf);
 	ft_strlcpy(res, stuck, stuck_len + 1);
 	ft_strlcpy(&res[stuck_len], buf, buf_len + 1);
+	stuck = NULL;
+	buf = NULL;
 	return (res);
 }
 // int	next_line_checker(char *buf)
-// //\nを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる
+// //ENDを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる
 // {
 // 	size_t i;
 // 	char *res;
 // 	i = 0;
-// 	while (buf[i] != '\n' || buf[i] != EOF || i < BUFFER_SIZE)
+// 	while (buf[i] != END || buf[i] != EOF || i < BUFFER_SIZE)
 // 	//基本バッファサイズ分回る
 // 	{
 // 		i++;
-// 		if (buf[i] == '\n' || buf[i] == EOF || i < BUFFER_SIZE)
-// 			// bufのなかに\nが見つかった場合
+// 		if (buf[i] == END || buf[i] == EOF || i < BUFFER_SIZE)
+// 			// bufのなかにENDが見つかった場合
 // 			return (i);
 // 	}
-// 	if (buf[0] == '\n' || buf[0] == EOF)
+// 	if (buf[0] == END || buf[0] == EOF)
 // 		return (0);
-// 	return (-1); //バッファサイズ分回したけど\nがはいっていなかった。
+// 	return (-1); //バッファサイズ分回したけどENDがはいっていなかった。
 // }
 //正の数だった場合はそのままstatic内のものも足してmallocして文字列を作成する。
 //負の数だった場合はsizeにバッファサイズを足して、staticにも読み込んだ文字を入れる

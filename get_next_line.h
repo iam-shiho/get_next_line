@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:14:36 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 15:54:44 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 17:56:52 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <unistd.h>
 
 # define BUFFER_SIZE 42
+# define END '\n'
 
 char	*get_next_line(int fd);
 char	*read_buf(int fd, char *buf);
