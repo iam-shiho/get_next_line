@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:14:36 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 12:51:34 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 15:54:44 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,6 @@ size_t	ft_strlen(char *s);
 size_t	remake_str(char *stuck, char *buf, ssize_t buf_i);
 char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size);
 char	*ft_strdup(char *s);
+char	*ft_strjoin(char *stuck, char *buf);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 13:27:50 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 15:55:38 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*read_buf(int fd, char *buf)
 	if (tmp > 0)
 		buf[tmp] = '\0';
 	else if (tmp <= 0)
-		return (buf = NULL);
+		return (NULL);
 	return (buf);
 }
 
@@ -50,16 +50,16 @@ ssize_t	newline_number(char *buf)
 void	ft_strlcpy(char *res, char *stuck, size_t size)
 {
 	size_t	i;
-
+	if(size == 0)
+		return;
 	i = 0;
-	while (stuck[i] != '\0' && i < size)
+	while (stuck[i] != '\0' && i < size - 1)
 	{
 		res[i] = stuck[i];
 		++i;
 	}
 	res[i] = '\0';
 	free(stuck);
-	stuck = NULL;
 }
 
 size_t	ft_strlen(char *s)
@@ -68,32 +68,48 @@ size_t	ft_strlen(char *s)
 
 	size = 0;
 	if (!s)
-		return (-1);
+		return (0);
 	while (s[size] != '\0') //改行があるのか気にする
 		++size;
 	return (size);
 }
 
-char	*ft_strdup(char *s)
+char	*ft_strdup(char *stuck)
 {
 	size_t			len;
-	char			*dest;
+	char			*res;
 	unsigned int	i;
 
 	i = 0;
-	len = ft_strlen(s);
-	dest = (char *)malloc(sizeof(char) * (len + 1));
-	if (!dest)
+	len = ft_strlen(stuck);
+	res = (char *)malloc(sizeof(char) * (len + 1));
+	if (!res)
 		return (NULL);
-	while (i < len)
-	{
-		dest[i] = s[i];
-		i++;
-	}
-	dest[i] = '\0';
-	free(s);
-	s = NULL;
-	return (dest);
+	ft_strlcpy(res,stuck,len+1);
+	free(stuck);
+	return (res);
+}
+
+char	*ft_strjoin(char *stuck, char *buf)
+{
+	size_t			stuck_len;
+	size_t			buf_len;
+	unsigned int	i;
+	unsigned int	j;
+	char			*res;
+
+	i = 0;
+	j = 0;
+	if (!stuck || !buf)
+		return (NULL);
+	stuck_len = ft_strlen(stuck);
+	buf_len = ft_strlen(buf);
+	res = malloc(sizeof(char) * (stuck_len + buf_len + 1));
+	if (!res)
+		return (NULL);
+	ft_strlcpy(res, stuck, stuck_len + 1);
+	ft_strlcpy(&res[stuck_len], buf, buf_len + 1);
+	return (res);
 }
 // int	next_line_checker(char *buf)
 // //\nを検知する あった場合その文字列のインデックスを返す。 比べるときは比べるものを−１する bufの長さもわかる

@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 13:30:11 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/23 15:49:29 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,16 @@ size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
 {
 	size_t	stuck_len;
 	size_t	buf_size;
+	char *tmp;
 
 	// tmpにstuck内のなかみを預ける
 	stuck_len = ft_strlen(stuck);
 	buf_size = buf_i + 1;
+	tmp = ft_strdup(stuck);
 	stuck = (char *)malloc(sizeof(char) * (stuck_len + buf_size + 1));
 	if (!stuck)
 		return (-1);
-	ft_strlcpy(stuck, ft_strdup(stuck), stuck_len);
+	ft_strlcpy(stuck, tmp, stuck_len);
 	ft_strlcpy(&stuck[stuck_len], buf, buf_size);
 	return (ft_strlen(stuck));
 }
@@ -58,6 +60,8 @@ char	*get_next_line(int fd)
 	ssize_t			buf_i;
 	static ssize_t	stuck_len;
 
+	if (fd < 0 || BUFFER_SIZE <= 0)
+        return (NULL);
 	buf = NULL;
 	buf_i = -1;
 	while (buf_i < 0)
@@ -65,12 +69,15 @@ char	*get_next_line(int fd)
 		buf = read_buf(fd, buf);
 		if (buf == NULL)               // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
 			return (ft_strdup(stuck)); // strdup nisite
+		printf("#%s#", buf);
 		buf_i = newline_number(buf);
 		if (buf_i > -1)
 		{
 			return (result_str(buf, buf_i, stuck, stuck_len));
 		}
-		stuck_len += remake_str(stuck, buf, buf_i);
+		stuck = ft_strjoin(stuck, buf);
+		stuck_len = ft_strlen(stuck);
+		buf = NULL;
 	}
 	return (NULL);
 }
@@ -87,31 +94,31 @@ readでエラーが出た場合はNULLを返す
 
 // stuck_len += (buf_i + 1),
 
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*buf;
-
-// 	buf = NULL;
-// 	fd = open("./a.txt", O_RDONLY);
-// 	// get_next_line(fd);
-// 	buf = read_buf(fd, buf);
-// 	printf("$%s$", read_buf(fd, buf));
-// 	printf("#%s#", buf);
-// 	printf("^%zd^", newline_number(buf));
-// 	close(fd);
-// }
-
 int	main(void)
 {
-	char	*str_for_test;
-	char	*res;
+	int		fd;
+	char	*buf;
 
-	str_for_test = strdup("Hello");
-	res = ft_strdup(str_for_test);
-	free(res);
-	return (0);
+	buf = NULL;
+	fd = open("./a.txt", O_RDONLY);
+	get_next_line(fd);
+	buf = read_buf(fd, buf);
+	// printf("$%s$", read_buf(fd, buf));
+	// printf("#%s#", buf);
+	// printf("^%zd^", newline_number(buf));
+	close(fd);
 }
+
+// int	main(void)
+// {
+// 	char	*str_for_test;
+// 	char	*res;
+
+// 	str_for_test = strdup("Hello");
+// 	res = ft_strdup(str_for_test);
+// 	free(res);
+// 	return (0);
+// }
 
 // int	main(void)
 // {
