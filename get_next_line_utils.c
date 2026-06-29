@@ -6,16 +6,17 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:17:22 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 18:47:54 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/29 17:18:05 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 //ファイルを読み込む
-char	*read_buf(int fd, char *buf)
+char	*read_buf(int fd)
 {
 	ssize_t	tmp;
+	char	*buf;
 
 	buf = malloc(BUFFER_SIZE + 1); //'\0'入れるための＋１
 	if (!buf)
@@ -107,8 +108,8 @@ char	*ft_strjoin(char *stuck, char *buf)
 	res = malloc(sizeof(char) * (stuck_len + buf_len + 1));
 	if (!res)
 		return (NULL);
-	stuck =  ft_strdup(stuck);
-	buf =  ft_strdup(buf);
+	stuck = ft_strdup(stuck);
+	buf = ft_strdup(buf);
 	ft_strlcpy(res, stuck, stuck_len + 1);
 	ft_strlcpy(&res[stuck_len], buf, buf_len + 1);
 	stuck = NULL;

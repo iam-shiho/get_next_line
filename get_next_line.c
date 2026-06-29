@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/23 21:38:59 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/06/29 17:18:15 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ char	*get_next_line(int fd)
 	buf_i = -1;
 	while (buf_i < 0)
 	{
-		buf = read_buf(fd, buf);
+		buf = read_buf(fd);
 		if (buf == NULL)               // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
 			return (ft_strdup(stuck)); // strdup nisite
 		printf("#%s#\n", buf);
