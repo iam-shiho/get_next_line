@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/16 11:14:36 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/29 17:18:22 by swaragay         ###   ########.fr       */
+/*   Created: 2026/06/29 15:37:41 by swaragay          #+#    #+#             */
+/*   Updated: 2026/07/01 16:19:02 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,12 @@
 # define BUFFER_SIZE 42
 # define END '\n'
 
-char	*get_next_line(int fd);
-char	*read_buf(int fd);
+char	*read_buf(int fd, char *stuck);
 ssize_t	newline_number(char *buf);
-void	ft_strlcpy(char *res, char *stuck, size_t size);
+char	*get_next_line(int fd);
+char	*result_str(size_t buf_i, char *stuck);
+char	*new_strlcpy(char *tmp, ssize_t buf_i);
+char	*ft_strdup(char *stuck);
 size_t	ft_strlen(char *s);
-size_t	remake_str(char *stuck, char *buf, ssize_t buf_i);
-char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size);
-char	*ft_strdup(char *s);
 char	*ft_strjoin(char *stuck, char *buf);
-
 #endif

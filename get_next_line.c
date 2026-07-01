@@ -5,113 +5,120 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/16 11:12:57 by swaragay          #+#    #+#             */
-/*   Updated: 2026/06/29 17:18:15 by swaragay         ###   ########.fr       */
+/*   Created: 2026/06/29 16:23:05 by swaragay          #+#    #+#             */
+/*   Updated: 2026/07/01 17:09:07 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	remake_str(char *stuck, char *buf, ssize_t buf_i)
+char	*read_buf(int fd, char *stuck)
 {
-	size_t	stuck_len;
-	size_t	buf_size;
-	char	*tmp;
+	ssize_t	tmp;
+	char	*buf;
 
-	// tmpにstuck内のなかみを預ける
-	stuck_len = ft_strlen(stuck);
-	buf_size = buf_i + 1;
-	tmp = ft_strdup(stuck);
-	stuck = (char *)malloc(sizeof(char) * (stuck_len + buf_size + 1));
-	if (!stuck)
-		return (-1);
-	stuck = ft_strjoin(tmp, buf);
-	// ft_strlcpy(stuck, tmp, stuck_len);
-	// ft_strlcpy(&stuck[stuck_len], buf, buf_size);
-	return (ft_strlen(stuck));
+	buf = malloc(BUFFER_SIZE + 1);
+	if (!buf)
+		return (NULL);
+	while (1)
+	{
+		tmp = read(fd, buf, BUFFER_SIZE);
+		if (tmp == -1)
+			return (free(buf), free(stuck), NULL);
+		if (tmp == 0)
+		{
+			free(buf);
+			break ;
+		}
+		buf[tmp] = '\0';
+		if (newline_number(buf) > -1)
+			return (ft_strjoin(stuck, buf));
+		stuck = ft_strjoin(stuck, buf);
+	}
+	return (stuck);
 }
 
-// returnする文字列の作成
-// stuckのサイズをかぞえたい
-char	*result_str(char *buf, size_t buf_i, char *stuck, size_t size)
+ssize_t	newline_number(char *buf)
 {
-	char	*res;
-	char	*tmp;
-	size_t	i;
+	ssize_t	buf_i;
 
-	i = 0;
-	res = (char *)malloc(sizeof(char) * (size + buf_i + 1 + 1));
-	if (!res)
-		return (NULL);
-	tmp = malloc(sizeof(char) * (buf_i + 1));
-	if (!res)
-		return (NULL);
-	ft_strlcpy(tmp, buf, buf_i + 1);
-	res = ft_strjoin(stuck, tmp);
-	// staticの中身の長さとbufの改行文字までのながさをmallocする
-	// ft_strlcpy(res, stuck, size);
-	// ft_strlcpy(&res[size], buf, buf_i + 1);
-	// if (ft_strlen(buf) - buf_i > 0) //余った部分をstaticに入れ込む作業
-	// {
-	// 	stuck = (char *)malloc(sizeof(char) * ((buf_i + 1) + 1));
-	// 	//インデックスのズレと'\0'をいれるため
-	// 	ft_strlcpy(stuck, &buf[buf_i], ft_strlen(buf) - buf_i);
-	// }
-	return (res);
+	buf_i = 0;
+	if (!buf)
+		return (-1);
+	while (buf[buf_i])
+	{
+		if (buf[buf_i] == END)
+			return (buf_i);
+		++buf_i;
+	}
+	return (-1);
 }
 
 char	*get_next_line(int fd)
 {
-	char			*buf;
-	static char		*stuck;
-	ssize_t			buf_i;
-	static ssize_t	stuck_len;
+	char		*res;
+	static char	*stuck;
+	char		*tmp;
+	ssize_t		buf_i;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buf = NULL;
-	buf_i = -1;
-	while (buf_i < 0)
+	stuck = read_buf(fd, stuck); //改行がある文字列か、最後まで読み込んだ文字列がやってくる
+	if (stuck == NULL)
+		return (NULL);
+	buf_i = newline_number(stuck);
+	if (buf_i > -1)
 	{
-		buf = read_buf(fd);
-		if (buf == NULL)               // resにstuck分mallocする。strlcpy関数に入れ込んでもいい;
-			return (ft_strdup(stuck)); // strdup nisite
-		printf("#%s#\n", buf);
-		buf_i = newline_number(buf);
-		printf("index#%zd#\n", buf_i);
-		if (buf_i > -1)
-			return (result_str(buf, buf_i, stuck, stuck_len));
-		if (stuck == NULL)
-		{
-			stuck = malloc(ft_strlen(buf) + 1);
-			ft_strlcpy(stuck, buf, ft_strlen(buf) + 1);
-			printf("stuck1#%s#\n", stuck);
-		}
-		else
-		{
-			stuck = ft_strjoin(stuck, buf);
-			printf("stuck2#%s#\n", stuck);
-		}
-		printf("stuck#%s#\n", stuck);
-		stuck_len = ft_strlen(stuck);
-		printf("len#%zd#\n", stuck_len);
-		printf("stuck2##\n");
-		buf = NULL;
+		res = result_str(buf_i, stuck); //改行まで
+		tmp = ft_strdup(stuck);         // stuckを一旦フリーするため
+		free(stuck);
+		stuck = new_strlcpy(tmp, buf_i); //あまりを入れる
+		free(tmp);
+		return (res);
 	}
-	return (NULL);
+	return (stuck);
 }
-// stuckのサイズをはかって,bufの長さをたしたサイズ分mallocし直してstatic変数を更新する。もとからstuck内にある文字列は別のところに移してswapみたいにする。
-/*
-readで読み込み、読み込みに失敗していないかtmpでかくにんする。
-失敗していたらstatic変数の中身を返す。（再度mallocして新しい変数にいれてかえす。freeとNULL文字いれるのを忘れずに）
-bufのなかみに改行があったらstaticの中身もたして新しい変数にいれ出力。
-なかったらstaticに保存され改行文字またはEOFがでるまでreadを繰り返す。
 
+char	*result_str(size_t buf_i, char *stuck)
+{
+	char	*res;
+	size_t	i;
+	size_t	res_len;
 
-readでエラーが出た場合はNULLを返す
-*/
+	i = 0;
+	res_len = buf_i + 1;
+	res = (char *)malloc(sizeof(char) * (res_len + 1));
+	if (!res)
+		return (NULL);
+	while (stuck[i] && i < res_len)
+	{
+		res[i] = stuck[i];
+		++i;
+	}
+	res[i] = '\0';
+	return (res);
+}
 
-// stuck_len += (buf_i + 1),
+char	*new_strlcpy(char *tmp, ssize_t buf_i)
+{
+	size_t	i;
+	size_t	j;
+	size_t	tmp_len;
+	char	*res;
+
+	tmp_len = ft_strlen(tmp) - buf_i;
+	res = (char *)malloc(sizeof(char) * (tmp_len + 1));
+	i = buf_i + 1;
+	j = 0;
+	while (tmp[i] != '\0')
+	{
+		res[j] = tmp[i];
+		++i;
+		++j;
+	}
+	res[j] = '\0';
+	return (res);
+}
 
 int	main(void)
 {
@@ -120,7 +127,6 @@ int	main(void)
 
 	buf = NULL;
 	fd = open("./a.txt", O_RDONLY);
-	get_next_line(fd);
 	printf("%s", get_next_line(fd));
 	// buf = read_buf(fd, buf);
 	// printf("$%s$", read_buf(fd, buf));
@@ -128,135 +134,3 @@ int	main(void)
 	// printf("^%zd^", newline_number(buf));
 	close(fd);
 }
-
-// int	main(void)
-// {
-// 	char	*str_for_test;
-// 	char	*res;
-
-// 	str_for_test = strdup("Hello");
-// 	res = ft_strdup(str_for_test);
-// 	free(res);
-// 	return (0);
-// }
-
-// int	main(void)
-// {
-// 	printf("%s", ft_strdup("Hello"));
-// }
-
-// char	*get_next_line(int fd)
-// {
-// 	char		*buf;
-// 	char		*hako;
-// 	char		*res;
-// 	static char	*stuck;
-// 	int			i;
-// 	int			j;
-// 	int			k;
-// 	int			l;
-// 	static int	size;
-// 	ssize_t		tmp;
-
-// 	buf = NULL;
-// 	size = 0;
-// 	while (!buf)
-// 	{
-// 		j = 0;
-// 		k = 0;
-// 		if (!buf) //バッファサイズ分読み取る //1
-// 		{
-// 			buf = malloc(BUFFER_SIZE);
-// 			if (!buf)
-// 				return (NULL);
-// 			tmp = read(fd, buf, BUFFER_SIZE);
-// 			if (tmp == -1)
-// 				return ("-1");
-// 		}
-// 		i = 0;
-// 		while (buf[i] != END || buf[i] != EOF || i < (BUFFER_SIZE))
-// //ENDチェック
-// 		{
-// 			++i;
-// 			if (buf[i] == END || buf[i] == EOF) //
-// 改行を見つけた際、returnする文字列の作成 3
-// 			{
-// 				k = 0;
-// 				l = 0;
-// 				res = (char *)malloc(sizeof(char *) * (i +
-// size));
-// 				//ENDまでのメモリを確保する
-// 				if (!res)
-// 					return (NULL);
-// 				while (k < size) // stuckの中身を代入
-// 				{
-// 					res[k] = stuck[k];
-// 					++k;
-// 				}
-// 				while (l < i) // bufの中身を代入
-// 				{
-// 					res[k] = buf[l];
-// 					++k;
-// 					++l;
-// 				}
-// 				free(stuck);
-// 				l = 0;
-// 				if (0 < (BUFFER_SIZE - 1) - i)
-// 				{
-// 					stuck = (char *)malloc(sizeof(char *) *
-// ((BUFFER_SIZE - 1)
-// 								- i));
-// 					while ((BUFFER_SIZE - 1) - i)
-// 					{
-// 						stuck[l] = buf[i];
-// 						++l;
-// 						++i;
-// 					}
-// 				}
-// 				free(buf);
-// 				return (res);
-// 			}
-// 		}
-// 		//もし0文字目でENDがあった場合の対応をする
-// 		//行の文字列の長さを出力する
-// 		hako = malloc(size);
-// 		while (k < size) //
-// stuckの中身を代入　buf分ついかしたいから再度mallocをする。
-// 		{
-// 			hako[k] = stuck[k];
-// 			++k;
-// 		}
-// 		free(stuck);
-// 		stuck = NULL;
-// 		/*
-// 		stuckにbufを入れていく。
-// 		stuckに入っているやつを一回別の場所に移して、free.
-// 		そのあとstuck足すiのmallocをしてreturnする文字列を作成する。
-// 		ENDがまだない場合はENDがでてくるまでreadを繰り返す
-// 		ENDが出てきた場合はreturnする。
-// 		mallocとfreeを繰り返して返すものをつくっていく。
-// 		*/
-// 		size += i;
-// 		stuck = (char *)malloc(sizeof(char *) * size);
-// 		if (!stuck)
-// 			return (NULL);
-// 		k = 0;
-// 		l = 0;
-// 		while (k < j) // stuckの中身を代入
-// 		{
-// 			stuck[k] = hako[k];
-// 			++k;
-// 		}
-// 		while (l < i) // bufの中身を代入
-// 		{
-// 			stuck[k] = buf[l];
-// 			++k;
-// 			++l;
-// 		}
-// 		free(buf);
-// 		buf = NULL;
-// 		//→もういっかいread
-// 	}
-// 	return (NULL);
-// }
-// static内を更新する
