@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 15:37:41 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/01 20:36:51 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/01 20:56:20 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 # define END '\n'
 
 char	*read_buf(int fd, char *stuck);
-ssize_t	newline_number(char *buf);
 char	*get_next_line(int fd);
 char	*result_str(char *stuck);
 char	*new_strlcpy(char *tmp, ssize_t buf_i);

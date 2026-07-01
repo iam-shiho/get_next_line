@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 16:23:05 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/01 20:52:28 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/01 20:56:15 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,22 +63,6 @@ char	*result_str(char *stuck)
 		str[i++] = END;
 	str[i] = '\0';
 	return (str);
-}
-
-ssize_t	newline_number(char *buf)
-{
-	ssize_t	buf_i;
-
-	buf_i = 0;
-	if (!buf)
-		return (-1);
-	while (buf[buf_i])
-	{
-		if (buf[buf_i] == END)
-			return (buf_i);
-		++buf_i;
-	}
-	return (-1);
 }
 
 char	*get_next_line(int fd)
