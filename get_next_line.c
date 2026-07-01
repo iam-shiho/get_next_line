@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 16:23:05 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/01 17:09:07 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/01 20:52:28 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,55 @@
 
 char	*read_buf(int fd, char *stuck)
 {
-	ssize_t	tmp;
+	ssize_t	read_bytes;
 	char	*buf;
 
-	buf = malloc(BUFFER_SIZE + 1);
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
 		return (NULL);
 	while (1)
 	{
-		tmp = read(fd, buf, BUFFER_SIZE);
-		if (tmp == -1)
-			return (free(buf), free(stuck), NULL);
-		if (tmp == 0)
+		read_bytes = read(fd, buf, BUFFER_SIZE);
+		if (read_bytes == -1)
 		{
 			free(buf);
-			break ;
+			return (ft_free(stuck));
 		}
-		buf[tmp] = '\0';
-		if (newline_number(buf) > -1)
-			return (ft_strjoin(stuck, buf));
+		if (read_bytes == 0)
+			break ;
+		buf[read_bytes] = '\0';
 		stuck = ft_strjoin(stuck, buf);
+		if (!stuck)
+			return (ft_free(buf));
+		if (ft_strchr(buf, END))
+			break ;
 	}
-	return (stuck);
+	return (free(buf), stuck);
+}
+
+char	*result_str(char *stuck)
+{
+	int		i;
+	char	*str;
+
+	if (!stuck || !stuck[0])
+		return (NULL);
+	i = 0;
+	while (stuck[i] && stuck[i] != END)
+		++i;
+	str = (char *)malloc(sizeof(char) * (i + 1 + (stuck[i] == END)));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (stuck[i] && stuck[i] != END)
+	{
+		str[i] = stuck[i];
+		++i;
+	}
+	if (stuck[i] == END)
+		str[i++] = END;
+	str[i] = '\0';
+	return (str);
 }
 
 ssize_t	newline_number(char *buf)
@@ -59,43 +86,18 @@ char	*get_next_line(int fd)
 	char		*res;
 	static char	*stuck;
 	char		*tmp;
-	ssize_t		buf_i;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stuck = read_buf(fd, stuck); //改行がある文字列か、最後まで読み込んだ文字列がやってくる
+	stuck = read_buf(fd, stuck);
 	if (stuck == NULL)
 		return (NULL);
-	buf_i = newline_number(stuck);
-	if (buf_i > -1)
-	{
-		res = result_str(buf_i, stuck); //改行まで
-		tmp = ft_strdup(stuck);         // stuckを一旦フリーするため
-		free(stuck);
-		stuck = new_strlcpy(tmp, buf_i); //あまりを入れる
-		free(tmp);
-		return (res);
-	}
-	return (stuck);
-}
-
-char	*result_str(size_t buf_i, char *stuck)
-{
-	char	*res;
-	size_t	i;
-	size_t	res_len;
-
-	i = 0;
-	res_len = buf_i + 1;
-	res = (char *)malloc(sizeof(char) * (res_len + 1));
-	if (!res)
-		return (NULL);
-	while (stuck[i] && i < res_len)
-	{
-		res[i] = stuck[i];
-		++i;
-	}
-	res[i] = '\0';
+	res = result_str(stuck);
+	tmp = stuck;
+	stuck = ft_strdup(&stuck[ft_strlen(res)]);
+	ft_free(tmp);
+	if (stuck && stuck[0] == '\0')
+		stuck = ft_free(stuck);
 	return (res);
 }
 
@@ -117,20 +119,22 @@ char	*new_strlcpy(char *tmp, ssize_t buf_i)
 		++j;
 	}
 	res[j] = '\0';
+	free(tmp);
 	return (res);
 }
 
-int	main(void)
-{
-	int		fd;
-	char	*buf;
+// int	main(void)
+// {
+// 	int		fd;
+// 	char	*buf;
 
-	buf = NULL;
-	fd = open("./a.txt", O_RDONLY);
-	printf("%s", get_next_line(fd));
-	// buf = read_buf(fd, buf);
-	// printf("$%s$", read_buf(fd, buf));
-	// printf("#%s#", buf);
-	// printf("^%zd^", newline_number(buf));
-	close(fd);
-}
+// 	fd = open("./a.txt", O_RDONLY);
+// 	buf = get_next_line(fd);
+// 	printf("%s", buf);
+// 	// buf = read_buf(fd, buf);
+// 	// printf("$%s$", read_buf(fd, buf));
+// 	// printf("#%s#", buf);
+// 	// printf("^%zd^", newline_number(buf));
+// 	free(buf);
+// 	close(fd);
+// }
