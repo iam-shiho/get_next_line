@@ -1,125 +1,44 @@
-// #include "get_next_line.h"
+#include "get_next_line.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-// // char	*read_buf(int fd, char *buf)
-// // {
-// // 	ssize_t	tmp;
+int	main(int argc, char **argv)
+{
+	int		fd;
+	char	*line;
+	int		count;
 
-// // 	buf = malloc(BUFFER_SIZE + 1); //'\0'入れるための＋１
-// // 	if (!buf)
-// // 		return (NULL);
-// // 	tmp = read(fd, buf, BUFFER_SIZE);
-// // 	printf("%zdEND", tmp);
-// // 	if (tmp > 0)
-// // 	{
-// // 		buf[tmp] = '\0';
-// // 	}
-// // 	return (buf);
-// // }
+	count = 1;
+	if (argc == 2)
+	{
+		fd = open(argv[1], O_RDONLY);
+		if (fd == -1)
+		{
+			perror("Error opening file");
+			return (1);
+		}
+	}
+	else
+	{
+		printf("--- Reading from Standard Input (Type something and press Enter) ---\n");
+		fd = 0;
+	}
+	printf("--- Start Reading ---\n");
+	while ((line = get_next_line(-1)) != NULL)
+	{
+		printf("Line [%02d]: |%s|", count++, line);
+		free(line);
+	}
+	printf("\n--- End of Reading ---\n");
+	if (fd != 0)
+		close(fd);
+	return (0);
+}
 
-// // int	main(void)
-// // {
-// // 	int		fd;
-// // 	char	*buf;
-
-// // 	buf = NULL;
-// // 	fd = open("./a.txt", O_RDONLY);
-// // 	printf("%s", read_buf(fd, buf));
-// // 	close(fd);
-// // }
-// char	*ft_strdup(char *s)
-// {
-// 	size_t			len;
-// 	char			*dest;
-// 	unsigned int	i;
-
-// 	i = 0;
-// 	len = ft_strlen(s);
-// 	dest = (char *)malloc(sizeof(char) * (len + 1));
-// 	if (!dest)
-// 		return (NULL);
-// 	while (i < len)
-// 	{
-// 		dest[i] = s[i];
-// 		i++;
-// 	}
-// 	dest[i] = '\0';
-// 	// free(s);
-// 	return (dest);
-// }
-
-// size_t	ft_strlen(char *s)
-// {
-// 	size_t	size;
-
-// 	size = 0;
-// 	if (!s)
-// 		return (0);
-// 	while (s[size] != '\0') //改行があるのか気にする
-// 		++size;
-// 	return (size);
-// }
-
-// void	ft_strlcpy(char *res, char *stuck, size_t size)
-// {
-// 	size_t	i;
-
-// 	i = 0;
-// 	while (stuck[i] != '\0' && i < size - 1)
-// 	{
-// 		res[i] = stuck[i];
-// 		++i;
-// 	}
-// 	res[i] = '\0';
-// 	free(stuck);
-// }
-
-// char	*ft_strjoin(char *stuck, char *buf)
-// {
-// 	size_t			stuck_len;
-// 	size_t			buf_len;
-// 	unsigned int	i;
-// 	unsigned int	j;
-// 	char			*res;
-
-// 	i = 0;
-// 	j = 0;
-// 	if (!stuck || !buf)
-// 		return (NULL);
-// 	stuck_len = ft_strlen(stuck);
-// 	buf_len = ft_strlen(buf);
-// 	res = malloc(sizeof(char) * (stuck_len + buf_len + 1));
-// 	if (!res)
-// 		return (NULL);
-// 	ft_strlcpy(res, stuck, stuck_len + 1);
-// 	ft_strlcpy(&res[stuck_len], buf, buf_len + 1);
-// 	return (res);
-// }
-
-// // int	main(void)
-// // {
-// // 	char	*str1;
-// // 	char	*str2;
-// // 	char	*str3;
-// // 	size_t	i;
-
-// // 	str3 = malloc(8);
-// // 	str1 = ft_strdup("Hello");
-// // 	str2 = ft_strdup("42");
-// // 	ft_strlcpy(str3, str1, 6);
-// // 	i = ft_strlen(str3);
-// // 	ft_strlcpy(&str3[i], str2, 3);
-// // 	write(1, str3, 10);
-// // }
-
-// int	main(void)
-// {
-// 	char	*str1;
-// 	char	*str2;
-// 	char	*res;
-
-// 	str1 = ft_strdup("Hello");
-// 	str2 = ft_strdup("42");
-// 	res = ft_strjoin(str1, str2);
-// 	write(1, res, 10);
-// 	free(res);
-// }
+/**
+cc -Wall -Wextra -Werror
+	-D BUFFER_SIZE=42 main.c get_next_line.c get_next_line_utils.c
+./a.out test.txt
+**/

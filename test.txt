@@ -1,0 +1,6 @@
+First line is normal.
+12345
+{The line above was empty}
+
+This line is very long to test if it exceeds BUFFER_SIZE correctly: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+No newline at the end of this file
