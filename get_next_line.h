@@ -6,17 +6,17 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 15:37:41 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/02 17:47:16 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/02 18:29:05 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# include <fcntl.h>
-# include <stdio.h>
+// # include <fcntl.h>
+// # include <stdio.h>
+//# include <string.h>
 # include <stdlib.h>
-# include <string.h>
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
