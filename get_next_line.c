@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 16:23:05 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/02 14:20:38 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/02 16:59:54 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,37 +69,38 @@ char	*get_next_line(int fd)
 {
 	char		*res;
 	static char	*stuck;
-	char		*tmp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	stuck = read_buf(fd, stuck);
 	if (!stuck || stuck[0] == '\0')
-		return (stuck = ft_free(stuck));
+		return (stuck = ft_free(stuck), NULL);
 	res = result_str(stuck);
 	if (!res)
-		return (stuck = ft_free(stuck));
-	tmp = stuck;
-	stuck = ft_strdup(&stuck[ft_strlen(res)]);
-	if (!stuck && res)
-		return (free(res), NULL);
-	ft_free(tmp);
-	if (stuck && stuck[0] == '\0')
-		stuck = ft_free(stuck);
+		return (stuck = ft_free(stuck), NULL);
+	stuck = ft_restuck(stuck);
+	// if (!stuck)
+	// 	return (free(res), NULL);
+	// if (stuck && stuck[0] == '\0')
+	// 	stuck = ft_free(stuck);
 	return (res);
 }
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*buf;
 
-// 	fd = open("./a.txt", O_RDONLY);
-// 	buf = get_next_line(fd);
-// 	printf("%s", buf);
-// 	// buf = read_buf(fd, buf);
-// 	// printf("$%s$", read_buf(fd, buf));
-// 	// printf("#%s#", buf);
-// 	// printf("^%zd^", newline_number(buf));
-// 	free(buf);
-// 	close(fd);
-// }
+int	main(void)
+{
+	int		fd;
+	char	*buf;
+
+	fd = open("./1char.txt", O_RDONLY);
+	buf = get_next_line(fd);
+	printf("%s", buf);
+	free(buf);
+	// buf = read_buf(fd, buf);
+	// printf("$%s$", read_buf(fd, buf));
+	// printf("#%s#", buf);
+	// printf("^%zd^", newline_number(buf));
+	buf = get_next_line(fd);
+	printf("%s", buf);
+	free(buf);
+	close(fd);
+}
