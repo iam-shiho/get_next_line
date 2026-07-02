@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 16:22:59 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/01 20:35:15 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/01 22:16:27 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@ char	*ft_strjoin(char *stuck, char *buf)
 	char			*res;
 
 	if (!buf)
-		return (NULL);
+		return (stuck);
 	i = 0;
 	j = 0;
 	res = malloc(sizeof(char) * (ft_strlen(stuck) + ft_strlen(buf) + 1));
 	if (!res)
-		return (NULL);
+		return (ft_free(stuck));
 	while (stuck && stuck[i])
 	{
 		res[i] = stuck[i];
@@ -36,7 +36,7 @@ char	*ft_strjoin(char *stuck, char *buf)
 		++j;
 	}
 	res[i + j] = '\0';
-	return (ft_free(stuck), res);
+	return (free(stuck), res);
 }
 
 char	*ft_strdup(char *stuck)

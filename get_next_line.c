@@ -6,7 +6,7 @@
 /*   By: swaragay <swaragay@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 16:23:05 by swaragay          #+#    #+#             */
-/*   Updated: 2026/07/01 20:56:15 by swaragay         ###   ########.fr       */
+/*   Updated: 2026/07/02 14:20:38 by swaragay         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*read_buf(int fd, char *stuck)
 
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
-		return (NULL);
+		return (ft_free(stuck));
 	while (1)
 	{
 		read_bytes = read(fd, buf, BUFFER_SIZE);
@@ -74,39 +74,20 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	stuck = read_buf(fd, stuck);
-	if (stuck == NULL)
-		return (NULL);
+	if (!stuck || stuck[0] == '\0')
+		return (stuck = ft_free(stuck));
 	res = result_str(stuck);
+	if (!res)
+		return (stuck = ft_free(stuck));
 	tmp = stuck;
 	stuck = ft_strdup(&stuck[ft_strlen(res)]);
+	if (!stuck && res)
+		return (free(res), NULL);
 	ft_free(tmp);
 	if (stuck && stuck[0] == '\0')
 		stuck = ft_free(stuck);
 	return (res);
 }
-
-char	*new_strlcpy(char *tmp, ssize_t buf_i)
-{
-	size_t	i;
-	size_t	j;
-	size_t	tmp_len;
-	char	*res;
-
-	tmp_len = ft_strlen(tmp) - buf_i;
-	res = (char *)malloc(sizeof(char) * (tmp_len + 1));
-	i = buf_i + 1;
-	j = 0;
-	while (tmp[i] != '\0')
-	{
-		res[j] = tmp[i];
-		++i;
-		++j;
-	}
-	res[j] = '\0';
-	free(tmp);
-	return (res);
-}
-
 // int	main(void)
 // {
 // 	int		fd;
